@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Lang, translations } from "./translations";
+import { Lang, translations, TranslationShape } from "./translations";
 
 type Ctx = {
   lang: Lang;
   setLang: (l: Lang) => void;
-  t: (typeof translations)["en"];
+  t: TranslationShape;
 };
 
 const LanguageContext = createContext<Ctx | null>(null);

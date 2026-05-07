@@ -176,7 +176,9 @@ export const translations = {
     },
     footer: "ತಂತ್ರಜ್ಞಾನದೊಂದಿಗೆ ರೈತರನ್ನು ಸಬಲೀಕರಣಗೊಳಿಸುವುದು.",
   },
-} as const;
+};
+
+export type TranslationShape = (typeof translations)["en"];
 
 export const langNames: Record<Lang, string> = {
   en: "English",
