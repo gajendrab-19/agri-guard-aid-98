@@ -1,0 +1,188 @@
+export type Lang = "en" | "ta" | "te" | "kn";
+
+export const languages: { code: Lang; label: string }[] = [
+  { code: "en", label: "English" },
+  { code: "ta", label: "தமிழ்" },
+  { code: "te", label: "తెలుగు" },
+  { code: "kn", label: "ಕನ್ನಡ" },
+];
+
+export const translations = {
+  en: {
+    brand: "AgriGuard",
+    nav: { home: "Home", diagnose: "Diagnose", chat: "Ask AI", news: "News" },
+    hero: {
+      tag: "Smart Farming Assistant",
+      title: "Protect Your Crops with AI",
+      subtitle: "Identify plant diseases instantly, chat with our farming expert, and stay updated with the latest agricultural news.",
+      cta: "Diagnose a Plant",
+      cta2: "Ask the Expert",
+    },
+    diagnose: {
+      title: "Plant Disease Identification",
+      subtitle: "Upload a photo of your plant leaf to detect diseases instantly.",
+      upload: "Upload Image",
+      change: "Change Image",
+      analyzing: "Analyzing image...",
+      loadingModel: "Loading AI model...",
+      result: "Diagnosis",
+      confidence: "Confidence",
+      noResult: "No diagnosis yet. Upload an image to begin.",
+    },
+    chat: {
+      title: "Ask Our Farming Expert",
+      subtitle: "Get instant answers to your farming questions in your language.",
+      placeholder: "Ask about crops, soil, pests, irrigation...",
+      send: "Send",
+      thinking: "Thinking...",
+      welcome: "Hello! I'm your AgriGuard assistant. How can I help you today?",
+    },
+    news: {
+      title: "Latest Agri-News",
+      subtitle: "Regional agriculture updates and insights.",
+      readMore: "Read more",
+      items: [
+        { title: "Record Rice Harvest Expected in Tamil Nadu This Season", category: "Crops", date: "May 5, 2026" },
+        { title: "New Subsidy Scheme Launched for Tractor Purchases", category: "Policy", date: "May 4, 2026" },
+        { title: "Drip Irrigation Adoption Doubles in Karnataka Districts", category: "Technology", date: "May 3, 2026" },
+        { title: "Tomato Prices Surge as Demand Outpaces Supply", category: "Market", date: "May 2, 2026" },
+      ],
+    },
+    footer: "Empowering farmers with technology.",
+  },
+  ta: {
+    brand: "அக்ரிகார்ட்",
+    nav: { home: "முகப்பு", diagnose: "நோய் கண்டறிதல்", chat: "AI கேள்", news: "செய்திகள்" },
+    hero: {
+      tag: "ஸ்மார்ட் விவசாய உதவியாளர்",
+      title: "AI உடன் உங்கள் பயிர்களைப் பாதுகாக்கவும்",
+      subtitle: "தாவர நோய்களை உடனடியாக கண்டறியவும், எங்கள் விவசாய நிபுணருடன் உரையாடவும், சமீபத்திய விவசாய செய்திகளைப் பெறவும்.",
+      cta: "தாவரத்தைக் கண்டறியவும்",
+      cta2: "நிபுணரிடம் கேள்",
+    },
+    diagnose: {
+      title: "தாவர நோய் கண்டறிதல்",
+      subtitle: "நோய்களை உடனடியாகக் கண்டறிய உங்கள் தாவர இலையின் புகைப்படத்தைப் பதிவேற்றவும்.",
+      upload: "படத்தைப் பதிவேற்று",
+      change: "படத்தை மாற்று",
+      analyzing: "படத்தை பகுப்பாய்வு செய்கிறது...",
+      loadingModel: "AI மாதிரியை ஏற்றுகிறது...",
+      result: "கண்டறிதல்",
+      confidence: "நம்பிக்கை",
+      noResult: "இன்னும் கண்டறியப்படவில்லை. தொடங்க படத்தை பதிவேற்றவும்.",
+    },
+    chat: {
+      title: "எங்கள் விவசாய நிபுணரிடம் கேள்",
+      subtitle: "உங்கள் மொழியில் விவசாய கேள்விகளுக்கு உடனடி பதில்கள் பெறவும்.",
+      placeholder: "பயிர்கள், மண், பூச்சிகள், நீர்ப்பாசனம் பற்றி கேள்...",
+      send: "அனுப்பு",
+      thinking: "சிந்திக்கிறது...",
+      welcome: "வணக்கம்! நான் உங்கள் அக்ரிகார்ட் உதவியாளர். நான் எவ்வாறு உதவ முடியும்?",
+    },
+    news: {
+      title: "சமீபத்திய விவசாய செய்திகள்",
+      subtitle: "பிராந்திய விவசாய புதுப்பிப்புகள் மற்றும் நுண்ணறிவுகள்.",
+      readMore: "மேலும் படிக்க",
+      items: [
+        { title: "இந்த பருவத்தில் தமிழ்நாட்டில் சாதனை நெல் அறுவடை எதிர்பார்க்கப்படுகிறது", category: "பயிர்கள்", date: "மே 5, 2026" },
+        { title: "டிராக்டர் வாங்குவதற்கு புதிய மானியத் திட்டம் தொடங்கப்பட்டது", category: "கொள்கை", date: "மே 4, 2026" },
+        { title: "கர்நாடக மாவட்டங்களில் சொட்டுநீர் பாசனம் இரட்டிப்பாகியுள்ளது", category: "தொழில்நுட்பம்", date: "மே 3, 2026" },
+        { title: "தேவை அதிகரிப்பால் தக்காளி விலை உயர்வு", category: "சந்தை", date: "மே 2, 2026" },
+      ],
+    },
+    footer: "தொழில்நுட்பத்துடன் விவசாயிகளை மேம்படுத்துதல்.",
+  },
+  te: {
+    brand: "అగ్రిగార్డ్",
+    nav: { home: "హోమ్", diagnose: "నిర్ధారణ", chat: "AI అడగండి", news: "వార్తలు" },
+    hero: {
+      tag: "స్మార్ట్ వ్యవసాయ సహాయకుడు",
+      title: "AI తో మీ పంటలను రక్షించండి",
+      subtitle: "మొక్కల వ్యాధులను తక్షణమే గుర్తించండి, మా వ్యవసాయ నిపుణుడితో చాట్ చేయండి, తాజా వ్యవసాయ వార్తలను తెలుసుకోండి.",
+      cta: "మొక్కను నిర్ధారించండి",
+      cta2: "నిపుణుడిని అడగండి",
+    },
+    diagnose: {
+      title: "మొక్కల వ్యాధి గుర్తింపు",
+      subtitle: "వ్యాధులను తక్షణమే గుర్తించడానికి మీ మొక్క ఆకు ఫోటోను అప్‌లోడ్ చేయండి.",
+      upload: "చిత్రాన్ని అప్‌లోడ్ చేయండి",
+      change: "చిత్రాన్ని మార్చండి",
+      analyzing: "చిత్రాన్ని విశ్లేషిస్తోంది...",
+      loadingModel: "AI మోడల్‌ను లోడ్ చేస్తోంది...",
+      result: "నిర్ధారణ",
+      confidence: "విశ్వాసం",
+      noResult: "ఇంకా నిర్ధారణ లేదు. ప్రారంభించడానికి చిత్రాన్ని అప్‌లోడ్ చేయండి.",
+    },
+    chat: {
+      title: "మా వ్యవసాయ నిపుణుడిని అడగండి",
+      subtitle: "మీ భాషలో వ్యవసాయ ప్రశ్నలకు తక్షణ సమాధానాలు పొందండి.",
+      placeholder: "పంటలు, నేల, తెగుళ్లు, నీటిపారుదల గురించి అడగండి...",
+      send: "పంపు",
+      thinking: "ఆలోచిస్తోంది...",
+      welcome: "నమస్కారం! నేను మీ అగ్రిగార్డ్ సహాయకుడిని. నేను ఎలా సహాయపడగలను?",
+    },
+    news: {
+      title: "తాజా వ్యవసాయ వార్తలు",
+      subtitle: "ప్రాంతీయ వ్యవసాయ నవీకరణలు మరియు అంతర్దృష్టులు.",
+      readMore: "మరింత చదవండి",
+      items: [
+        { title: "ఈ సీజన్‌లో తమిళనాడులో రికార్డు వరి దిగుబడి అంచనా", category: "పంటలు", date: "మే 5, 2026" },
+        { title: "ట్రాక్టర్ కొనుగోళ్లకు కొత్త సబ్సిడీ పథకం ప్రారంభం", category: "విధానం", date: "మే 4, 2026" },
+        { title: "కర్ణాటక జిల్లాల్లో డ్రిప్ ఇరిగేషన్ రెట్టింపు", category: "సాంకేతికత", date: "మే 3, 2026" },
+        { title: "డిమాండ్ పెరగడంతో టమోటా ధరలు పెరిగాయి", category: "మార్కెట్", date: "మే 2, 2026" },
+      ],
+    },
+    footer: "సాంకేతికతతో రైతులను సాధికారపరచడం.",
+  },
+  kn: {
+    brand: "ಅಗ್ರಿಗಾರ್ಡ್",
+    nav: { home: "ಮುಖಪುಟ", diagnose: "ರೋಗನಿರ್ಣಯ", chat: "AI ಕೇಳಿ", news: "ಸುದ್ದಿ" },
+    hero: {
+      tag: "ಸ್ಮಾರ್ಟ್ ಕೃಷಿ ಸಹಾಯಕ",
+      title: "AI ಯೊಂದಿಗೆ ನಿಮ್ಮ ಬೆಳೆಗಳನ್ನು ರಕ್ಷಿಸಿ",
+      subtitle: "ಸಸ್ಯ ರೋಗಗಳನ್ನು ತಕ್ಷಣವೇ ಗುರುತಿಸಿ, ನಮ್ಮ ಕೃಷಿ ತಜ್ಞರೊಂದಿಗೆ ಚಾಟ್ ಮಾಡಿ, ಇತ್ತೀಚಿನ ಕೃಷಿ ಸುದ್ದಿಗಳೊಂದಿಗೆ ನವೀಕೃತರಾಗಿರಿ.",
+      cta: "ಸಸ್ಯವನ್ನು ನಿರ್ಣಯಿಸಿ",
+      cta2: "ತಜ್ಞರನ್ನು ಕೇಳಿ",
+    },
+    diagnose: {
+      title: "ಸಸ್ಯ ರೋಗ ಗುರುತಿಸುವಿಕೆ",
+      subtitle: "ರೋಗಗಳನ್ನು ತಕ್ಷಣವೇ ಪತ್ತೆಹಚ್ಚಲು ನಿಮ್ಮ ಸಸ್ಯ ಎಲೆಯ ಫೋಟೋವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+      upload: "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+      change: "ಚಿತ್ರವನ್ನು ಬದಲಾಯಿಸಿ",
+      analyzing: "ಚಿತ್ರವನ್ನು ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...",
+      loadingModel: "AI ಮಾದರಿಯನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...",
+      result: "ರೋಗನಿರ್ಣಯ",
+      confidence: "ವಿಶ್ವಾಸ",
+      noResult: "ಇನ್ನೂ ರೋಗನಿರ್ಣಯವಿಲ್ಲ. ಪ್ರಾರಂಭಿಸಲು ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+    },
+    chat: {
+      title: "ನಮ್ಮ ಕೃಷಿ ತಜ್ಞರನ್ನು ಕೇಳಿ",
+      subtitle: "ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಕೃಷಿ ಪ್ರಶ್ನೆಗಳಿಗೆ ತಕ್ಷಣದ ಉತ್ತರಗಳನ್ನು ಪಡೆಯಿರಿ.",
+      placeholder: "ಬೆಳೆಗಳು, ಮಣ್ಣು, ಕೀಟಗಳು, ನೀರಾವರಿ ಬಗ್ಗೆ ಕೇಳಿ...",
+      send: "ಕಳುಹಿಸಿ",
+      thinking: "ಯೋಚಿಸುತ್ತಿದೆ...",
+      welcome: "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಅಗ್ರಿಗಾರ್ಡ್ ಸಹಾಯಕ. ನಾನು ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+    },
+    news: {
+      title: "ಇತ್ತೀಚಿನ ಕೃಷಿ ಸುದ್ದಿಗಳು",
+      subtitle: "ಪ್ರಾದೇಶಿಕ ಕೃಷಿ ನವೀಕರಣಗಳು ಮತ್ತು ಒಳನೋಟಗಳು.",
+      readMore: "ಮತ್ತಷ್ಟು ಓದಿ",
+      items: [
+        { title: "ಈ ಋತುವಿನಲ್ಲಿ ತಮಿಳುನಾಡಿನಲ್ಲಿ ದಾಖಲೆ ಭತ್ತದ ಕೊಯ್ಲು ನಿರೀಕ್ಷೆ", category: "ಬೆಳೆಗಳು", date: "ಮೇ 5, 2026" },
+        { title: "ಟ್ರಾಕ್ಟರ್ ಖರೀದಿಗೆ ಹೊಸ ಸಬ್ಸಿಡಿ ಯೋಜನೆ ಆರಂಭ", category: "ನೀತಿ", date: "ಮೇ 4, 2026" },
+        { title: "ಕರ್ನಾಟಕದ ಜಿಲ್ಲೆಗಳಲ್ಲಿ ಡ್ರಿಪ್ ನೀರಾವರಿ ದ್ವಿಗುಣ", category: "ತಂತ್ರಜ್ಞಾನ", date: "ಮೇ 3, 2026" },
+        { title: "ಬೇಡಿಕೆ ಹೆಚ್ಚಳದಿಂದ ಟೊಮೆಟೊ ಬೆಲೆ ಏರಿಕೆ", category: "ಮಾರುಕಟ್ಟೆ", date: "ಮೇ 2, 2026" },
+      ],
+    },
+    footer: "ತಂತ್ರಜ್ಞಾನದೊಂದಿಗೆ ರೈತರನ್ನು ಸಬಲೀಕರಣಗೊಳಿಸುವುದು.",
+  },
+};
+
+export type TranslationShape = (typeof translations)["en"];
+
+export const langNames: Record<Lang, string> = {
+  en: "English",
+  ta: "Tamil",
+  te: "Telugu",
+  kn: "Kannada",
+};
