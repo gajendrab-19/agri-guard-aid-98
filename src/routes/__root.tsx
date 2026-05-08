@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "AgriGuard" },
+      { name: "description", content: "AgriGuard AI Hub is a professional agriculture website for disease identification, AI-powered farming advice, and news." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "AgriGuard" },
+      { property: "og:description", content: "AgriGuard AI Hub is a professional agriculture website for disease identification, AI-powered farming advice, and news." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "AgriGuard" },
+      { name: "twitter:description", content: "AgriGuard AI Hub is a professional agriculture website for disease identification, AI-powered farming advice, and news." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/AlOVNa8Mu8VFtnwKsJUcs2lAWzo1/social-images/social-1778217450575-logo1.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/AlOVNa8Mu8VFtnwKsJUcs2lAWzo1/social-images/social-1778217450575-logo1.webp" },
     ],
     links: [
       {
