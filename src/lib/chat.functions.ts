@@ -15,13 +15,13 @@ const inputSchema = z.object({
 export const askExpert = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }) => {
-    const HF_API_KEY = process.env.HF_API_KEY;
-    if (!HF_API_KEY) {
-      return { reply: "", error: "HF_API_KEY is not configured." };
+    const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
+    if (!LOVABLE_API_KEY) {
+      return { reply: "", error: "AI service is not configured." };
     }
 
     const langName = langNames[data.lang as Lang];
-    const system = `You are AgriGuard, a friendly expert assistant for farmers. You provide concise, practical advice on crops, soil, pests, irrigation, fertilizers, and weather. Always respond in ${langName} language. Keep answers under 150 words.`;
+    const system = `You are AgriGuard, a friendly expert assistant for farmers. You provide concise, practical advice on crops, soil, pests, irrigation, fertilizers, and weather. Always respond in ${langName} language. Keep answers under 150 words and use markdown formatting where helpful.`;
 
     const messages = [
       { role: "system", content: system },
@@ -30,27 +30,28 @@ export const askExpert = createServerFn({ method: "POST" })
     ];
 
     try {
-      const res = await fetch(
-        "https://router.huggingface.co/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${HF_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "HuggingFaceH4/zephyr-7b-beta",
-            messages,
-            max_tokens: 350,
-            temperature: 0.7,
-          }),
-        }
-      );
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages,
+        }),
+      });
 
       if (!res.ok) {
+        if (res.status === 429) {
+          return { reply: "", error: "Rate limit reached. Please wait a moment and try again." };
+        }
+        if (res.status === 402) {
+          return { reply: "", error: "AI credits exhausted. Please add funds in Workspace Settings → Usage." };
+        }
         const txt = await res.text();
-        console.error("HF error", res.status, txt);
-        return { reply: "", error: `Hugging Face error (${res.status}). Please try again.` };
+        console.error("AI gateway error", res.status, txt);
+        return { reply: "", error: `AI service error (${res.status}). Please try again.` };
       }
 
       const json = await res.json();
