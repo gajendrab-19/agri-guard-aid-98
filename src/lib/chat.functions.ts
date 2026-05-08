@@ -23,17 +23,17 @@ export const askExpert = createServerFn({ method: "POST" })
     const langName = langNames[data.lang as Lang];
     const system = `You are AgriGuard, a friendly expert assistant for farmers. You provide concise, practical advice on crops, soil, pests, irrigation, fertilizers, and weather. Always respond in ${langName} language. Keep answers under 150 words.`;
 
-    // Build Mistral instruct prompt format
-    let prompt = `<s>[INST] ${system}\n\n`;
+    // Build Zephyr chat prompt format
+    let prompt = `<|system|>\n${system}</s>\n`;
     for (const m of data.history) {
-      if (m.role === "user") prompt += `${m.content} [/INST] `;
-      else prompt += `${m.content} </s><s>[INST] `;
+      const role = m.role === "user" ? "user" : "assistant";
+      prompt += `<|${role}|>\n${m.content}</s>\n`;
     }
-    prompt += `${data.message} [/INST]`;
+    prompt += `<|user|>\n${data.message}</s>\n<|assistant|>\n`;
 
     try {
       const res = await fetch(
-        "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
+        "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta",
         {
           method: "POST",
           headers: {
