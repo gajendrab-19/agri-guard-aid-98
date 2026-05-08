@@ -23,17 +23,15 @@ export const askExpert = createServerFn({ method: "POST" })
     const langName = langNames[data.lang as Lang];
     const system = `You are AgriGuard, a friendly expert assistant for farmers. You provide concise, practical advice on crops, soil, pests, irrigation, fertilizers, and weather. Always respond in ${langName} language. Keep answers under 150 words.`;
 
-    // Build Zephyr chat prompt format
-    let prompt = `<|system|>\n${system}</s>\n`;
-    for (const m of data.history) {
-      const role = m.role === "user" ? "user" : "assistant";
-      prompt += `<|${role}|>\n${m.content}</s>\n`;
-    }
-    prompt += `<|user|>\n${data.message}</s>\n<|assistant|>\n`;
+    const messages = [
+      { role: "system", content: system },
+      ...data.history.map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: data.message },
+    ];
 
     try {
       const res = await fetch(
-        "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta",
+        "https://router.huggingface.co/v1/chat/completions",
         {
           method: "POST",
           headers: {
@@ -41,12 +39,10 @@ export const askExpert = createServerFn({ method: "POST" })
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            inputs: prompt,
-            parameters: {
-              max_new_tokens: 350,
-              temperature: 0.7,
-              return_full_text: false,
-            },
+            model: "HuggingFaceH4/zephyr-7b-beta",
+            messages,
+            max_tokens: 350,
+            temperature: 0.7,
           }),
         }
       );
@@ -58,12 +54,7 @@ export const askExpert = createServerFn({ method: "POST" })
       }
 
       const json = await res.json();
-      const text =
-        Array.isArray(json) && json[0]?.generated_text
-          ? String(json[0].generated_text).trim()
-          : typeof json?.generated_text === "string"
-            ? json.generated_text.trim()
-            : "";
+      const text = json?.choices?.[0]?.message?.content?.trim() ?? "";
 
       if (!text) return { reply: "", error: "Empty response from model. Try again." };
       return { reply: text, error: null };
