@@ -12,6 +12,26 @@ const inputSchema = z.object({
     .default([]),
 });
 
+const fallbackAdvice: Record<Lang, string> = {
+  en: "I’m having trouble reaching the live AI service right now, but here is practical guidance: inspect the crop closely, check leaf color/spots, soil moisture, recent weather, and pest activity. Avoid overwatering, remove badly affected leaves, and use balanced fertilizer. If you describe the crop, symptoms, and your location, I can guide you step by step.",
+  ta: "தற்போது நேரடி AI சேவையை அணுக முடியவில்லை, ஆனால் நடைமுறை ஆலோசனை: பயிரை நெருக்கமாகப் பாருங்கள், இலை நிறம்/புள்ளிகள், மண் ஈரப்பதம், சமீபத்திய வானிலை, பூச்சி தாக்கம் ஆகியவற்றைச் சரிபார்க்கவும். அதிக நீர்ப்பாசனத்தைத் தவிர்க்கவும், அதிகம் பாதிக்கப்பட்ட இலைகளை அகற்றவும், சமநிலை உரம் பயன்படுத்தவும்.",
+  te: "ప్రస్తుతం లైవ్ AI సేవను చేరుకోవడంలో సమస్య ఉంది, కానీ ఉపయోగకరమైన సూచన: పంటను దగ్గరగా పరిశీలించండి, ఆకుల రంగు/మచ్చలు, నేల తేమ, ఇటీవలి వాతావరణం, పురుగుల ప్రభావం చూడండి. అధిక నీటిపారుదల నివారించండి, ఎక్కువగా ప్రభావితమైన ఆకులను తొలగించండి, సమతుల్య ఎరువు వాడండి.",
+  kn: "ಈಗ ಲೈವ್ AI ಸೇವೆಯನ್ನು ಸಂಪರ್ಕಿಸಲು ತೊಂದರೆ ಇದೆ, ಆದರೆ ಉಪಯುಕ್ತ ಸಲಹೆ: ಬೆಳೆವನ್ನು ಹತ್ತಿರದಿಂದ ಪರಿಶೀಲಿಸಿ, ಎಲೆ ಬಣ್ಣ/ಚುಕ್ಕೆಗಳು, ಮಣ್ಣಿನ ತೇವಾಂಶ, ಇತ್ತೀಚಿನ ಹವಾಮಾನ ಮತ್ತು ಕೀಟ ಚಟುವಟಿಕೆ ನೋಡಿ. ಅತಿಯಾಗಿ ನೀರು ಹಾಕಬೇಡಿ, ಹೆಚ್ಚು ಬಾಧಿತ ಎಲೆಗಳನ್ನು ತೆಗೆದುಹಾಕಿ, ಸಮತೋಲನ ಗೊಬ್ಬರ ಬಳಸಿ.",
+};
+
+function buildFallbackReply(message: string, lang: Lang) {
+  const lower = message.toLowerCase();
+  const cropHint = lower.includes("wheat")
+    ? "\n\nWheat tip: keep the field well drained, watch for rust/yellowing, and apply nitrogen in split doses."
+    : lower.includes("rice") || lower.includes("paddy")
+      ? "\n\nRice tip: maintain proper water level, monitor blast/brown spot, and avoid excess nitrogen."
+      : lower.includes("tomato")
+        ? "\n\nTomato tip: check for leaf curl, early blight, and fruit borer; use staking and avoid wetting leaves."
+        : "";
+
+  return `${fallbackAdvice[lang]}${lang === "en" ? cropHint : ""}`;
+}
+
 export const askExpert = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }) => {
@@ -51,7 +71,7 @@ export const askExpert = createServerFn({ method: "POST" })
         }
         const txt = await res.text();
         console.error("AI gateway error", res.status, txt);
-        return { reply: "", error: `AI service error (${res.status}). Please try again.` };
+        return { reply: buildFallbackReply(data.message, data.lang as Lang), error: null };
       }
 
       const json = await res.json();
@@ -61,6 +81,6 @@ export const askExpert = createServerFn({ method: "POST" })
       return { reply: text, error: null };
     } catch (e) {
       console.error("askExpert failed", e);
-      return { reply: "", error: "Request failed. Please try again." };
+      return { reply: buildFallbackReply(data.message, data.lang as Lang), error: null };
     }
   });
