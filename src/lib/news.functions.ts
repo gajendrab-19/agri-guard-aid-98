@@ -122,14 +122,20 @@ export const fetchAgriNews = createServerFn({ method: "POST" })
         if (res.ok) {
           const json: any = await res.json();
           const news = Array.isArray(json?.news) ? json.news : [];
-          let items: NewsItem[] = news.slice(0, 8).map((n: any) => ({
-            title: String(n.title ?? "").trim(),
-            category: categoryQuery[cat].label,
-            date: fmtDate(n.published),
-            url: n.url,
-            image: n.image && n.image !== "None" ? n.image : undefined,
-            description: n.description,
-          })).filter((n: NewsItem) => n.title.length > 0);
+          let items: NewsItem[] = news.slice(0, 8).map((n: any) => {
+            const title = String(n.title ?? "").trim();
+            const url = n.url && /^https?:\/\//i.test(n.url)
+              ? n.url
+              : `https://news.google.com/search?q=${encodeURIComponent(title)}`;
+            return {
+              title,
+              category: categoryQuery[cat].label,
+              date: fmtDate(n.published),
+              url,
+              image: n.image && n.image !== "None" ? n.image : undefined,
+              description: n.description,
+            };
+          }).filter((n: NewsItem) => n.title.length > 0);
 
           if (items.length > 0) {
             items = await translateItems(items.slice(0, 8), lang);
