@@ -48,9 +48,9 @@ function Index() {
         <main>
           <Hero />
           <DiseaseIdentifier />
-          <ChatBot />
           <News />
         </main>
+        <FloatingChatBot />
         <Footer />
       </div>
     </LanguageProvider>
