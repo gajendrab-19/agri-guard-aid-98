@@ -149,7 +149,11 @@ export const fetchAgriNews = createServerFn({ method: "POST" })
       }
     }
 
-    // Fallback
-    const items = await translateItems(fallbackNews[cat], lang);
+    // Fallback — ensure each item has a working URL (Google News search)
+    const withUrls = fallbackNews[cat].map((n) => ({
+      ...n,
+      url: n.url ?? `https://news.google.com/search?q=${encodeURIComponent(n.title)}`,
+    }));
+    const items = await translateItems(withUrls, lang);
     return { items, error: null, source: "fallback" };
   });
