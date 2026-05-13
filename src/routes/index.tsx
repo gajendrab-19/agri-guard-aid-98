@@ -3,7 +3,7 @@ import { LanguageProvider } from "@/lib/language-context";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { DiseaseIdentifier } from "@/components/disease-identifier";
-import { ChatBot } from "@/components/chatbot";
+import { FloatingChatBot } from "@/components/floating-chatbot";
 import { News } from "@/components/news";
 import { useLang } from "@/lib/language-context";
 import { Sprout } from "lucide-react";
