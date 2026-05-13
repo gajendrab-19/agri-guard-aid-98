@@ -7,7 +7,6 @@ export function Navbar() {
   const links = [
     { href: "#home", label: t.nav.home },
     { href: "#diagnose", label: t.nav.diagnose },
-    { href: "#chat", label: t.nav.chat },
     { href: "#news", label: t.nav.news },
   ];
   return (
