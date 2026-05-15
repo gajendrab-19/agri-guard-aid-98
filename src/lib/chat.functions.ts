@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { langNames, type Lang } from "./translations";
 
@@ -13,10 +12,10 @@ const inputSchema = z.object({
 });
 
 const fallbackAdvice: Record<Lang, string> = {
-  en: "I’m having trouble reaching the live AI service right now, but here is practical guidance: inspect the crop closely, check leaf color/spots, soil moisture, recent weather, and pest activity. Avoid overwatering, remove badly affected leaves, and use balanced fertilizer. If you describe the crop, symptoms, and your location, I can guide you step by step.",
-  ta: "தற்போது நேரடி AI சேவையை அணுக முடியவில்லை, ஆனால் நடைமுறை ஆலோசனை: பயிரை நெருக்கமாகப் பாருங்கள், இலை நிறம்/புள்ளிகள், மண் ஈரப்பதம், சமீபத்திய வானிலை, பூச்சி தாக்கம் ஆகியவற்றைச் சரிபார்க்கவும். அதிக நீர்ப்பாசனத்தைத் தவிர்க்கவும், அதிகம் பாதிக்கப்பட்ட இலைகளை அகற்றவும், சமநிலை உரம் பயன்படுத்தவும்.",
-  te: "ప్రస్తుతం లైవ్ AI సేవను చేరుకోవడంలో సమస్య ఉంది, కానీ ఉపయోగకరమైన సూచన: పంటను దగ్గరగా పరిశీలించండి, ఆకుల రంగు/మచ్చలు, నేల తేమ, ఇటీవలి వాతావరణం, పురుగుల ప్రభావం చూడండి. అధిక నీటిపారుదల నివారించండి, ఎక్కువగా ప్రభావితమైన ఆకులను తొలగించండి, సమతుల్య ఎరువు వాడండి.",
-  kn: "ಈಗ ಲೈವ್ AI ಸೇವೆಯನ್ನು ಸಂಪರ್ಕಿಸಲು ತೊಂದರೆ ಇದೆ, ಆದರೆ ಉಪಯುಕ್ತ ಸಲಹೆ: ಬೆಳೆವನ್ನು ಹತ್ತಿರದಿಂದ ಪರಿಶೀಲಿಸಿ, ಎಲೆ ಬಣ್ಣ/ಚುಕ್ಕೆಗಳು, ಮಣ್ಣಿನ ತೇವಾಂಶ, ಇತ್ತೀಚಿನ ಹವಾಮಾನ ಮತ್ತು ಕೀಟ ಚಟುವಟಿಕೆ ನೋಡಿ. ಅತಿಯಾಗಿ ನೀರು ಹಾಕಬೇಡಿ, ಹೆಚ್ಚು ಬಾಧಿತ ಎಲೆಗಳನ್ನು ತೆಗೆದುಹಾಕಿ, ಸಮತೋಲನ ಗೊಬ್ಬರ ಬಳಸಿ.",
+  en: "I'm having trouble reaching the live AI service right now, but here is practical guidance: inspect the crop closely, check leaf color/spots, soil moisture, recent weather, and pest activity. Avoid overwatering, remove badly affected leaves, and use balanced fertilizer. If you describe the crop, symptoms, and your location, I can guide you step by step.",
+  ta: "தற்போது நேரடி AI சேவையை அணுக முடியவில்லை, ஆனால் நடைமுறை ஆலோசனை: பயிரை நெருக்கமாகப் பாருங்கள், இலை நிறம்/புள்ளிகள், மண் ஈரப்பதம், சமீபத்திய வானிலை, பூச்சி தாக்கம் ஆகியவற்றைச் சரிபார்க்கவும்.",
+  te: "ప్రస్తుతం లైవ్ AI సేవను చేరుకోవడంలో సమస్య ఉంది, కానీ ఉపయోగకరమైన సూచన: పంటను దగ్గరగా పరిశీలించండి, ఆకుల రంగు/మచ్చలు, నేల తేమ, ఇటీవలి వాతావరణం చూడండి.",
+  kn: "ಈಗ ಲೈವ್ AI ಸೇವೆಯನ್ನು ಸಂಪರ್ಕಿಸಲು ತೊಂದರೆ ಇದೆ, ಆದರೆ ಉಪಯುಕ್ತ ಸಲಹೆ: ಬೆಳೆವನ್ನು ಹತ್ತಿರದಿಂದ ಪರಿಶೀಲಿಸಿ, ಎಲೆ ಬಣ್ಣ/ಚುಕ್ಕೆಗಳು, ಮಣ್ಣಿನ ತೇವಾಂಶ ನೋಡಿ.",
 };
 
 function buildFallbackReply(message: string, lang: Lang) {
@@ -32,55 +31,61 @@ function buildFallbackReply(message: string, lang: Lang) {
   return `${fallbackAdvice[lang]}${lang === "en" ? cropHint : ""}`;
 }
 
-export const askExpert = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => inputSchema.parse(data))
-  .handler(async ({ data }) => {
-    const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-    if (!LOVABLE_API_KEY) {
-      return { reply: "", error: "AI service is not configured." };
-    }
+type ChatInput = z.infer<typeof inputSchema>;
 
-    const langName = langNames[data.lang as Lang];
-    const system = `You are AgriGuard, a friendly expert assistant for farmers. You provide concise, practical advice on crops, soil, pests, irrigation, fertilizers, and weather. Always respond in ${langName} language. Keep answers under 150 words and use markdown formatting where helpful.`;
+/**
+ * Calls the Gemini REST API directly from the client.
+ * API key is read from VITE_GEMINI_API_KEY.
+ */
+export async function askExpert(input: ChatInput): Promise<{ reply: string; error: string | null }> {
+  const data = inputSchema.parse(input);
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-    const messages = [
-      { role: "system", content: system },
-      ...data.history.map((m) => ({ role: m.role, content: m.content })),
-      { role: "user", content: data.message },
-    ];
+  if (!GEMINI_API_KEY) {
+    return { reply: buildFallbackReply(data.message, data.lang as Lang), error: "AI service is not configured. Add VITE_GEMINI_API_KEY to your .env file." };
+  }
 
-    try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const langName = langNames[data.lang as Lang];
+  const systemInstruction = `You are AgriGuard, a friendly expert assistant for farmers. You provide concise, practical advice on crops, soil, pests, irrigation, fertilizers, and weather. Always respond in ${langName} language. Keep answers under 150 words and use markdown formatting where helpful.`;
+
+  // Build Gemini-format contents from chat history
+  const contents = [
+    ...data.history.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    })),
+    { role: "user", parts: [{ text: data.message }] },
+  ];
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages,
+          system_instruction: { parts: [{ text: systemInstruction }] },
+          contents,
         }),
-      });
+      },
+    );
 
-      if (!res.ok) {
-        if (res.status === 429) {
-          return { reply: "", error: "Rate limit reached. Please wait a moment and try again." };
-        }
-        if (res.status === 402) {
-          return { reply: "", error: "AI credits exhausted. Please add funds in Workspace Settings → Usage." };
-        }
-        const txt = await res.text();
-        console.error("AI gateway error", res.status, txt);
-        return { reply: buildFallbackReply(data.message, data.lang as Lang), error: null };
+    if (!res.ok) {
+      if (res.status === 429) {
+        return { reply: "", error: "Rate limit reached. Please wait a moment and try again." };
       }
-
-      const json = await res.json();
-      const text = json?.choices?.[0]?.message?.content?.trim() ?? "";
-
-      if (!text) return { reply: "", error: "Empty response from model. Try again." };
-      return { reply: text, error: null };
-    } catch (e) {
-      console.error("askExpert failed", e);
+      const txt = await res.text();
+      console.error("Gemini API error", res.status, txt);
       return { reply: buildFallbackReply(data.message, data.lang as Lang), error: null };
     }
-  });
+
+    const json = await res.json();
+    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? "";
+
+    if (!text) return { reply: "", error: "Empty response from model. Try again." };
+    return { reply: text, error: null };
+  } catch (e) {
+    console.error("askExpert failed", e);
+    return { reply: buildFallbackReply(data.message, data.lang as Lang), error: null };
+  }
+}

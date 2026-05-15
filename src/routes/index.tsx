@@ -1,25 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { LanguageProvider } from "@/lib/language-context";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { DiseaseIdentifier } from "@/components/disease-identifier";
 import { FloatingChatBot } from "@/components/floating-chatbot";
 import { News } from "@/components/news";
 import { useLang } from "@/lib/language-context";
-import { Sprout } from "lucide-react";
+import { Sprout, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: Index,
-  head: () => ({
-    meta: [
-      { title: "AgriGuard — AI-Powered Plant Disease Detection & Farming Assistant" },
-      {
-        name: "description",
-        content:
-          "Identify plant diseases instantly with AI, chat with a multilingual farming expert, and read the latest agri-news. Available in English, Tamil, Telugu, and Kannada.",
-      },
-    ],
-  }),
 });
 
 function Footer() {
@@ -40,19 +30,33 @@ function Footer() {
   );
 }
 
+function NewsPreview() {
+  const { t } = useLang();
+  return (
+    <div>
+      <News />
+      <div className="flex justify-center pb-10">
+        <Button asChild size="lg" variant="outline" className="rounded-full">
+          <Link to="/news">
+            View All News <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function Index() {
   return (
-    <LanguageProvider>
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main>
-          <Hero />
-          <DiseaseIdentifier />
-          <News />
-        </main>
-        <FloatingChatBot />
-        <Footer />
-      </div>
-    </LanguageProvider>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main>
+        <Hero />
+        <DiseaseIdentifier />
+        <NewsPreview />
+      </main>
+      <FloatingChatBot />
+      <Footer />
+    </div>
   );
 }

@@ -31,6 +31,10 @@
   --color-ring: var(--ring);
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float-delayed 8s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.8s ease-out both;
+  --animate-shimmer: shimmer 2.5s ease-in-out infinite;
 }
 
 :root {
@@ -63,12 +67,72 @@
   --shadow-glow: 0 0 60px -10px oklch(0.68 0.18 145 / 0.45);
 }
 
+/* Keyframes for micro-animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-15px) scale(1.03); }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 @layer base {
   * { border-color: var(--color-border); }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: oklch(1 0 0 / 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid oklch(1 0 0 / 0.3);
+}
+
+/* Smooth page transitions */
+.page-enter {
+  animation: fade-up 0.5s ease-out both;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0.04 150);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0.08 150);
 }

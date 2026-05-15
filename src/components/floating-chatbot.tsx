@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { useLang } from "@/lib/language-context";
 import { askExpert } from "@/lib/chat.functions";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 export function FloatingChatBot() {
   const { t, lang } = useLang();
-  const ask = useServerFn(askExpert);
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -37,7 +35,7 @@ export function FloatingChatBot() {
     setInput("");
     setLoading(true);
     try {
-      const res = await ask({ data: { message: text, lang, history: messages.slice(-8) } });
+      const res = await askExpert({ message: text, lang, history: messages.slice(-8) });
       if (res.error) {
         setMessages([...newMsgs, { role: "assistant", content: `⚠️ ${res.error}` }]);
       } else {
@@ -83,7 +81,7 @@ export function FloatingChatBot() {
               </div>
               <div className="leading-tight">
                 <p className="text-sm font-semibold">{t.chat.title}</p>
-                <p className="text-[10px] opacity-90">AgriGuard AI · Online</p>
+                <p className="text-[10px] opacity-90">Powered by Gemini · Online</p>
               </div>
             </div>
             <button

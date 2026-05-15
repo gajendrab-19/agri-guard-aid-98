@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Upload, Loader2, ImageIcon, Microscope } from "lucide-react";
 
-const MODEL_URL = "https://teachablemachine.withgoogle.com/models/IKoG-ygTF/";
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/12vSza3Ch/";
 
 type Prediction = { className: string; probability: number };
 
@@ -145,12 +145,13 @@ export function DiseaseIdentifier() {
                       </span>
                     </div>
                   </div>
+                  {/* Show only the next 2 highest confidence results */}
                   {predictions && predictions.length > 1 && (
                     <div className="space-y-2 border-t pt-4">
                       <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         {t.diagnose.confidence}
                       </div>
-                      {predictions.slice(1).map((p) => (
+                      {predictions.slice(1, 3).map((p) => (
                         <div key={p.className} className="flex items-center gap-3 text-sm">
                           <span className="flex-1 truncate">{p.className}</span>
                           <div className="w-32">

@@ -1,6 +1,5 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { langNames, type Lang } from "./translations";
+import type { Lang } from "./translations";
 
 export type NewsCategory = "technology" | "schemes" | "crops" | "market" | "weather";
 
@@ -26,8 +25,6 @@ const categoryQuery: Record<NewsCategory, { keywords: string; category?: string;
   market:     { keywords: "mandi prices OR crop prices India OR agriculture market OR vegetable prices", label: "Market & Rates" },
   weather:    { keywords: "monsoon India OR weather farmers OR rainfall agriculture", label: "Weather" },
 };
-
-const langCodeMap: Record<Lang, string> = { en: "en", ta: "en", te: "en", kn: "en" }; // Currents free tier mostly english; AI translates fallback
 
 const fallbackNews: Record<NewsCategory, NewsItem[]> = {
   technology: [
@@ -71,62 +68,42 @@ function fmtDate(iso?: string): string {
   }
 }
 
-async function translateItems(items: NewsItem[], targetLang: Lang): Promise<NewsItem[]> {
-  if (targetLang === "en") return items;
-  const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
-  if (!LOVABLE_API_KEY) return items;
-  const langName = langNames[targetLang];
-  try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: `Translate ONLY the "title" and "category" fields of each JSON item to ${langName}. Keep "date" and other fields unchanged. Return JSON of shape {"items":[...]}.` },
-          { role: "user", content: JSON.stringify({ items }) },
-        ],
-        response_format: { type: "json_object" },
-      }),
-    });
-    if (!res.ok) return items;
-    const json = await res.json();
-    const text = json?.choices?.[0]?.message?.content?.trim() ?? "";
-    const parsed = JSON.parse(text);
-    const out: NewsItem[] = Array.isArray(parsed?.items) ? parsed.items : items;
-    return out.map((it, i) => ({ ...items[i], ...it }));
-  } catch {
-    return items;
-  }
-}
+type FetchInput = z.infer<typeof inputSchema>;
 
-export const fetchAgriNews = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => inputSchema.parse(data))
-  .handler(async ({ data }): Promise<{ items: NewsItem[]; error: string | null; source: "currents" | "fallback" }> => {
-    const cat = data.category as NewsCategory;
-    const lang = data.lang as Lang;
-    const NEWS_API_KEY = process.env.NEWS_API_KEY;
+/**
+ * Fetches agriculture news from Currents API (client-side).
+ * Falls back to curated headlines when no API key is configured.
+ */
+export async function fetchAgriNews(
+  input: FetchInput,
+): Promise<{ items: NewsItem[]; error: string | null; source: "currents" | "fallback" }> {
+  const data = inputSchema.parse(input);
+  const cat = data.category as NewsCategory;
+  const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY;
 
-    if (NEWS_API_KEY) {
-      try {
-        const params = new URLSearchParams({
-          keywords: categoryQuery[cat].keywords,
-          language: langCodeMap[lang],
-          country: "IN",
-          page_size: "8",
-          apiKey: NEWS_API_KEY,
-        });
-        if (categoryQuery[cat].category) params.set("category", categoryQuery[cat].category!);
+  if (NEWS_API_KEY) {
+    try {
+      const params = new URLSearchParams({
+        keywords: categoryQuery[cat].keywords,
+        language: "en",
+        country: "IN",
+        page_size: "8",
+        apiKey: NEWS_API_KEY,
+      });
+      if (categoryQuery[cat].category) params.set("category", categoryQuery[cat].category!);
 
-        const res = await fetch(`https://api.currentsapi.services/v1/latest-news?${params.toString()}`);
-        if (res.ok) {
-          const json: any = await res.json();
-          const news = Array.isArray(json?.news) ? json.news : [];
-          let items: NewsItem[] = news.slice(0, 8).map((n: any) => {
+      const res = await fetch(`https://api.currentsapi.services/v1/latest-news?${params.toString()}`);
+      if (res.ok) {
+        const json: any = await res.json();
+        const news = Array.isArray(json?.news) ? json.news : [];
+        const items: NewsItem[] = news
+          .slice(0, 8)
+          .map((n: any) => {
             const title = String(n.title ?? "").trim();
-            const url = n.url && /^https?:\/\//i.test(n.url)
-              ? n.url
-              : `https://news.google.com/search?q=${encodeURIComponent(title)}`;
+            const url =
+              n.url && /^https?:\/\//i.test(n.url)
+                ? n.url
+                : `https://news.google.com/search?q=${encodeURIComponent(title)}`;
             return {
               title,
               category: categoryQuery[cat].label,
@@ -135,25 +112,24 @@ export const fetchAgriNews = createServerFn({ method: "POST" })
               image: n.image && n.image !== "None" ? n.image : undefined,
               description: n.description,
             };
-          }).filter((n: NewsItem) => n.title.length > 0);
+          })
+          .filter((n: NewsItem) => n.title.length > 0);
 
-          if (items.length > 0) {
-            items = await translateItems(items.slice(0, 8), lang);
-            return { items, error: null, source: "currents" };
-          }
-        } else {
-          console.error("Currents API error", res.status, await res.text());
+        if (items.length > 0) {
+          return { items, error: null, source: "currents" };
         }
-      } catch (e) {
-        console.error("Currents fetch failed", e);
+      } else {
+        console.error("Currents API error", res.status, await res.text());
       }
+    } catch (e) {
+      console.error("Currents fetch failed", e);
     }
+  }
 
-    // Fallback — ensure each item has a working URL (Google News search)
-    const withUrls = fallbackNews[cat].map((n) => ({
-      ...n,
-      url: n.url ?? `https://news.google.com/search?q=${encodeURIComponent(n.title)}`,
-    }));
-    const items = await translateItems(withUrls, lang);
-    return { items, error: null, source: "fallback" };
-  });
+  // Fallback — ensure each item has a working URL
+  const items = fallbackNews[cat].map((n) => ({
+    ...n,
+    url: n.url ?? `https://news.google.com/search?q=${encodeURIComponent(n.title)}`,
+  }));
+  return { items, error: null, source: "fallback" };
+}

@@ -1,17 +1,10 @@
 import { useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { useLang } from "@/lib/language-context";
 import { Card } from "@/components/ui/card";
-import { Newspaper, ArrowUpRight, Loader2, RefreshCw, Cpu, Landmark, Sprout, BarChart3, CloudSun } from "lucide-react";
+import { Newspaper, ArrowUpRight, Loader2, RefreshCw, Cpu, Landmark, Sprout, BarChart3, CloudSun, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { fetchAgriNews, type NewsItem, type NewsCategory } from "@/lib/news.functions";
-import news1 from "@/assets/news-1.jpg";
-import news2 from "@/assets/news-2.jpg";
-import news3 from "@/assets/news-3.jpg";
-import news4 from "@/assets/news-4.jpg";
-
-const fallbackImages = [news1, news2, news3, news4];
 
 const CATEGORIES: { id: NewsCategory; label: string; icon: typeof Cpu }[] = [
   { id: "crops", label: "Crops", icon: Sprout },
@@ -21,9 +14,17 @@ const CATEGORIES: { id: NewsCategory; label: string; icon: typeof Cpu }[] = [
   { id: "weather", label: "Weather", icon: CloudSun },
 ];
 
+function NoImagePlaceholder({ category }: { category: string }) {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-primary/10 to-secondary text-primary/40">
+      <ImageOff className="h-8 w-8" />
+      <span className="mt-1 text-xs font-medium">{category}</span>
+    </div>
+  );
+}
+
 export function News() {
   const { t, lang } = useLang();
-  const fetchNews = useServerFn(fetchAgriNews);
   const [active, setActive] = useState<NewsCategory>("crops");
   const [cache, setCache] = useState<Record<string, NewsItem[]>>({});
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export function News() {
     if (!force && cache[cacheKey]?.length) return;
     setLoading(true);
     try {
-      const res = await fetchNews({ data: { lang, category: active } });
+      const res = await fetchAgriNews({ lang, category: active });
       setCache((c) => ({ ...c, [cacheKey]: res.items }));
       setSource(res.source);
     } catch {
@@ -82,7 +83,7 @@ export function News() {
               </Button>
               {source && (
                 <span className="text-xs text-muted-foreground">
-                  Source: {source === "currents" ? "Currents API" : "AgriGuard fallback"}
+                  Source: {source === "currents" ? "Currents API" : "AgriGuard curated"}
                 </span>
               )}
             </div>
@@ -104,15 +105,22 @@ export function News() {
                       className="group flex flex-col overflow-hidden border-primary/10 p-0 transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-card)]"
                     >
                       <div className="aspect-[4/3] overflow-hidden bg-muted">
-                        <img
-                          src={item.image || fallbackImages[i % fallbackImages.length]}
-                          alt={item.title}
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = fallbackImages[i % fallbackImages.length];
-                          }}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            loading="lazy"
+                            onError={(e) => {
+                              // Hide broken real images, show placeholder
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                              (e.currentTarget.nextElementSibling as HTMLElement)?.classList.remove("hidden");
+                            }}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : null}
+                        <div className={`h-full w-full ${item.image ? "hidden" : ""}`}>
+                          <NoImagePlaceholder category={item.category} />
+                        </div>
                       </div>
                       <div className="flex flex-1 flex-col p-5">
                         <div className="flex items-center justify-between text-xs">
