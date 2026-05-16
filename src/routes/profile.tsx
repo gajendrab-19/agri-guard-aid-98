@@ -38,19 +38,29 @@ function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      setMessage("Please select a JPEG or PNG image");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setMessage("File size must be under 2MB");
+      return;
+    }
+
     setUploading(true);
     setMessage(null);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${user.id}/avatar.${ext}`;
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("userId", user.id);
 
-      const { error: uploadErr } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
+      const res = await fetch("/api/antigravity/storage/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-      const url = data.publicUrl + "?t=" + Date.now();
+      if (!res.ok) throw new Error("Antigravity storage upload failed");
+      const { url } = await res.json();
 
       await supabase.auth.updateUser({ data: { avatar_url: url } });
       setAvatarUrl(url);

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useLang } from "@/lib/language-context";
-import { askExpert } from "@/lib/chat.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ReactMarkdown from "react-markdown";
@@ -35,15 +34,18 @@ export function FloatingChatBot() {
     setInput("");
     setLoading(true);
     try {
-      const res = await askExpert({ message: text, lang, history: messages.slice(-8) });
-      if (res.error) {
-        setMessages([...newMsgs, { role: "assistant", content: `⚠️ ${res.error}` }]);
-      } else {
-        setMessages([...newMsgs, { role: "assistant", content: res.reply }]);
-      }
+      // Native Antigravity chatbot implementation
+      const res = await fetch("/api/antigravity/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, history: messages.slice(-8), lang }),
+      });
+      if (!res.ok) throw new Error("Antigravity orchestrator unreachable");
+      const data = await res.json();
+      setMessages([...newMsgs, { role: "assistant", content: data.reply }]);
       if (!open) setUnread(true);
-    } catch {
-      setMessages([...newMsgs, { role: "assistant", content: "⚠️ Network error. Please try again." }]);
+    } catch (err: any) {
+      setMessages([...newMsgs, { role: "assistant", content: `⚠️ ${err.message || "Network error. Please try again."}` }]);
     } finally {
       setLoading(false);
     }

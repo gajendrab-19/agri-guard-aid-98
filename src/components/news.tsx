@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Newspaper, ArrowUpRight, Loader2, RefreshCw, Cpu, Landmark, Sprout, BarChart3, CloudSun, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { fetchAgriNews, type NewsItem, type NewsCategory } from "@/lib/news.functions";
+import { toast } from "sonner";
+import { fallbackNews, fetchLiveNews, type NewsItem, type NewsCategory } from "@/lib/news.functions";
 
 const CATEGORIES: { id: NewsCategory; label: string; icon: typeof Cpu }[] = [
   { id: "crops", label: "Crops", icon: Sprout },
@@ -37,11 +38,30 @@ export function News() {
     if (!force && cache[cacheKey]?.length) return;
     setLoading(true);
     try {
-      const res = await fetchAgriNews({ lang, category: active });
-      setCache((c) => ({ ...c, [cacheKey]: res.items }));
-      setSource(res.source);
+      if (force) {
+        const res = await fetchLiveNews(active);
+        setCache((c) => ({ ...c, [cacheKey]: res.items }));
+        setSource(res.source);
+        if (res.source === "fallback") {
+          toast.error("Live API unavailable. Showing curated news.");
+        } else {
+          toast.success("Live news fetched successfully.");
+        }
+      } else {
+        const res = await fetch("/static-news.json");
+        if (res.ok) {
+          const data = await res.json();
+          const categoryItems = data[active] || [];
+          setCache((c) => ({ ...c, [cacheKey]: categoryItems.length ? categoryItems : fallbackNews[active] }));
+          setSource(categoryItems.length ? "currents" : "fallback");
+        } else {
+          setCache((c) => ({ ...c, [cacheKey]: fallbackNews[active] }));
+          setSource("fallback");
+        }
+      }
     } catch {
-      // keep stale cache
+      setCache((c) => ({ ...c, [cacheKey]: fallbackNews[active] }));
+      setSource("fallback");
     } finally {
       setLoading(false);
     }
